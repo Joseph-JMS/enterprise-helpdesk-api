@@ -1,5 +1,6 @@
 package com.devgroup.enterprise_helpdesk_api.entities;
 
+import com.devgroup.enterprise_helpdesk_api.enums.RoleName;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,8 +11,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(unique = true)
-    private String name;
+    private RoleName name;
 
     public Long getId() {
         return id;
@@ -19,10 +21,10 @@ public class Role {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getName() {
+    public RoleName getName() {
         return name;
     }
-    public void setName(String name) {
+    public void setName(RoleName name) {
         this.name = name;
     }
 }

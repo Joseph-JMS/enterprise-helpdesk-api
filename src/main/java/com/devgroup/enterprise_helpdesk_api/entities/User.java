@@ -28,9 +28,6 @@ public class User {
 
     private boolean enabled;
 
-    @Transient
-    private boolean admin;
-
     @ManyToMany
     @JoinTable(
         name = "users_roles",
@@ -81,12 +78,6 @@ public class User {
     }
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-    public boolean isAdmin() {
-        return admin;
-    }
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
     }
     public List<Role> getRoles() {
         return roles;
