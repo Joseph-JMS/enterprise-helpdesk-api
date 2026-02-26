@@ -26,6 +26,7 @@ public class JwtUtils {
         List<String> authorities = auth.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
+                .filter(role -> role.startsWith("ROLE_"))
                 .collect(Collectors.toList());
 
         return Jwts.builder()
