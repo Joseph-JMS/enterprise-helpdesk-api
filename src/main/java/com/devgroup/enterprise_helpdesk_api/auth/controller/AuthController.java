@@ -1,0 +1,78 @@
+package com.devgroup.enterprise_helpdesk_api.auth.controller;
+
+import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RefreshTokenRequest;
+import com.devgroup.enterprise_helpdesk_api.auth.dto.response.AuthResponse;
+import com.devgroup.enterprise_helpdesk_api.auth.entity.RefreshToken;
+import com.devgroup.enterprise_helpdesk_api.auth.service.RefreshTokenService;
+import com.devgroup.enterprise_helpdesk_api.security.jwt.JwtUtils;
+import com.devgroup.enterprise_helpdesk_api.auth.dto.request.LoginRequest;
+import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
+import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+    private final RefreshTokenService refreshTokenService;
+
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, RefreshTokenService refreshTokenService) {
+        this.authService = authService;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.refreshTokenService = refreshTokenService;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
+        authService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Usuario registrado exitosamente"));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+
+        return ResponseEntity.ok(authService.buildAuthResponse(authentication));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refreshAuth(request.getRefreshToken()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        String username = jwtUtils.extractUsernameFromRequest(request);
+
+        if (username != null) {
+            refreshTokenService.revokeByUsername(username);
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Sesion cerrada exitosamente"));
+    }
+
+    @GetMapping("/validate")
+    public ResponseEntity<Map<String,Object>> validate(HttpServletRequest request) {
+        return ResponseEntity.ok(authService.validateAuth(request));
+    }
+
+}

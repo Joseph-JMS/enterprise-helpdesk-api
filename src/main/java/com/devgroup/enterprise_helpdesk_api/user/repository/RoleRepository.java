@@ -1,6 +1,6 @@
-package com.devgroup.enterprise_helpdesk_api.repositories;
+package com.devgroup.enterprise_helpdesk_api.user.repository;
 
-import com.devgroup.enterprise_helpdesk_api.entities.Role;
+import com.devgroup.enterprise_helpdesk_api.user.entity.Role;
 import com.devgroup.enterprise_helpdesk_api.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 

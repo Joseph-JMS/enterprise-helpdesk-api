@@ -1,7 +1,7 @@
-package com.devgroup.enterprise_helpdesk_api.controllers;
+package com.devgroup.enterprise_helpdesk_api.user.controller;
 
-import com.devgroup.enterprise_helpdesk_api.security.payloads.RegisterRequest;
-import com.devgroup.enterprise_helpdesk_api.services.AuthService;
+import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
+import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

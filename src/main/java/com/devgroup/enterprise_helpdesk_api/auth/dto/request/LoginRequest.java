@@ -1,4 +1,4 @@
-package com.devgroup.enterprise_helpdesk_api.security.payloads;
+package com.devgroup.enterprise_helpdesk_api.auth.dto.request;
 
 public class LoginRequest {
     private String username;

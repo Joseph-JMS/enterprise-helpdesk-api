@@ -1,6 +1,6 @@
-package com.devgroup.enterprise_helpdesk_api.repositories;
+package com.devgroup.enterprise_helpdesk_api.user.repository;
 
-import com.devgroup.enterprise_helpdesk_api.entities.User;
+import com.devgroup.enterprise_helpdesk_api.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
