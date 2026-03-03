@@ -8,7 +8,7 @@ import com.devgroup.enterprise_helpdesk_api.user.entity.User;
 import com.devgroup.enterprise_helpdesk_api.enums.RoleName;
 import com.devgroup.enterprise_helpdesk_api.user.repository.RoleRepository;
 import com.devgroup.enterprise_helpdesk_api.user.repository.UserRepository;
-import com.devgroup.enterprise_helpdesk_api.security.jwt.JwtUtils;
+import com.devgroup.enterprise_helpdesk_api.security.JwtUtils;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;

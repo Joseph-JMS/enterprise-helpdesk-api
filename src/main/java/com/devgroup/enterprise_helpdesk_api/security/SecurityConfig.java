@@ -1,6 +1,5 @@
 package com.devgroup.enterprise_helpdesk_api.security;
 
-import com.devgroup.enterprise_helpdesk_api.security.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

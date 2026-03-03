@@ -1,4 +1,4 @@
-package com.devgroup.enterprise_helpdesk_api.security.jwt;
+package com.devgroup.enterprise_helpdesk_api.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {

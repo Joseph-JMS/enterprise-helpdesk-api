@@ -2,15 +2,13 @@ package com.devgroup.enterprise_helpdesk_api.auth.controller;
 
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RefreshTokenRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.response.AuthResponse;
-import com.devgroup.enterprise_helpdesk_api.auth.entity.RefreshToken;
 import com.devgroup.enterprise_helpdesk_api.auth.service.RefreshTokenService;
-import com.devgroup.enterprise_helpdesk_api.security.jwt.JwtUtils;
+import com.devgroup.enterprise_helpdesk_api.security.JwtUtils;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.LoginRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,8 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
