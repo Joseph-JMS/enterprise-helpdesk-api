@@ -1,6 +1,5 @@
 package com.devgroup.enterprise_helpdesk_api.user.entity;
 
-import com.devgroup.enterprise_helpdesk_api.enums.RoleName;
 import jakarta.persistence.*;
 
 @Entity

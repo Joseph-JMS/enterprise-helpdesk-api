@@ -2,12 +2,11 @@ package com.devgroup.enterprise_helpdesk_api.auth.controller;
 
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RefreshTokenRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.response.AuthResponse;
+import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
 import com.devgroup.enterprise_helpdesk_api.auth.service.RefreshTokenService;
-import com.devgroup.enterprise_helpdesk_api.security.JwtUtils;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.LoginRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +23,11 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
 
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtUtils jwtUtils, RefreshTokenService refreshTokenService) {
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, RefreshTokenService refreshTokenService) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
         this.refreshTokenService = refreshTokenService;
     }
 
@@ -51,24 +48,26 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return ResponseEntity.ok(authService.refreshAuth(request.getRefreshToken()));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
-        String username = jwtUtils.extractUsernameFromRequest(request);
-
-        if (username != null) {
-            refreshTokenService.revokeByUsername(username);
+    public ResponseEntity<Map<String, String>> logout(Authentication authentication) {
+        if (authentication != null && authentication.getName() != null) {
+            refreshTokenService.revokeByUsername(authentication.getName());
         }
 
         return ResponseEntity.ok(Map.of("message", "Sesion cerrada exitosamente"));
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<Map<String,Object>> validate(HttpServletRequest request) {
-        return ResponseEntity.ok(authService.validateAuth(request));
+    public ResponseEntity<Map<String,Object>> validate(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new InvalidTokenException("Header de autorizacion faltante o invalida");
+        }
+        String token = authHeader.substring(7);
+        return ResponseEntity.ok(authService.validateAuth(token));
     }
 
 }

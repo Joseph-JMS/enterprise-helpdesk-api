@@ -3,7 +3,6 @@ package com.devgroup.enterprise_helpdesk_api.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class JwtUtils {
@@ -32,7 +28,9 @@ public class JwtUtils {
     }
 
     public String generateAccessToken(Authentication auth) {
-        UserDetails userPrincipal = (UserDetails) auth.getPrincipal();
+        if (auth == null || !(auth.getPrincipal() instanceof UserDetails userPrincipal)) {
+            throw new IllegalArgumentException("El objeto de autenticacion no es valido");
+        }
         return buildToken(userPrincipal.getUsername(), auth.getAuthorities(), expirationMs);
     }
 
@@ -67,10 +65,10 @@ public class JwtUtils {
                 .getPayload();
     }
 
-    public boolean validateToken(String token) {
+    public boolean isTokenInvalid(String token) {
         try {
             getClaims(token);
-            return true;
+            return false;
         } catch (ExpiredJwtException e) {
             log.warn("JWT expirado: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
@@ -82,18 +80,7 @@ public class JwtUtils {
         } catch (IllegalArgumentException e) {
             log.warn("JWT vacío o nulo: {}", e.getMessage());
         }
-        return false;
-    }
-
-    public String extractUsernameFromRequest(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            if (validateToken(token)) {
-                return getUsernameFromToken(token);
-            }
-        }
-        return null;
+        return true;
     }
 
     public String getUsernameFromToken(String token) {
@@ -101,7 +88,14 @@ public class JwtUtils {
     }
 
     public List<String> getRolesFromToken(String token) {
-        return getClaims(token).get("authorities", List.class);
+        Object authClaim = getClaims(token).get("Authorities");
+        if (authClaim instanceof List<?> rawList) {
+            return rawList.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .toList();
+        }
+        return Collections.emptyList();
     }
 
     public Date getExpirationFromToken(String token) {

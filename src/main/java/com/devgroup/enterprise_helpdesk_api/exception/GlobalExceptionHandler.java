@@ -2,6 +2,7 @@ package com.devgroup.enterprise_helpdesk_api.exception;
 
 import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException;
+import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,6 +37,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "Usuario o contraseña incorrectos"));
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", ex.getMessage()));
     }
 
 }

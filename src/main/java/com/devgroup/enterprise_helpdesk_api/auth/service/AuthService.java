@@ -5,12 +5,12 @@ import com.devgroup.enterprise_helpdesk_api.auth.entity.RefreshToken;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
 import com.devgroup.enterprise_helpdesk_api.user.entity.Role;
 import com.devgroup.enterprise_helpdesk_api.user.entity.User;
-import com.devgroup.enterprise_helpdesk_api.enums.RoleName;
+import com.devgroup.enterprise_helpdesk_api.user.entity.RoleName;
+import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.user.repository.RoleRepository;
 import com.devgroup.enterprise_helpdesk_api.user.repository.UserRepository;
 import com.devgroup.enterprise_helpdesk_api.security.JwtUtils;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +42,7 @@ public class AuthService {
     public void registerUser(RegisterRequest request) {
 
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Error: El username ya está en uso");
+            throw new UserAlreadyExistsException("El username ya esta en uso");
         }
 
         User user = new User();
@@ -109,16 +109,8 @@ public class AuthService {
         );
     }
 
-    public Map<String, Object> validateAuth(HttpServletRequest request) {
-        String header = request.getHeader("Auhtorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new InvalidTokenException("Token invalido o expirado");
-        }
-
-        String token = header.substring(7);
-
-        if (!jwtUtils.validateToken(token)) {
+    public Map<String, Object> validateAuth(String token) {
+        if (jwtUtils.isTokenInvalid(token)) {
             throw new InvalidTokenException("Token invalido o expirado");
         }
 
@@ -132,6 +124,6 @@ public class AuthService {
 
     private Role getRoleFromDb(RoleName name) {
         return roleRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("Error: Rol " + name + " no encontrado en la DB."));
+                .orElseThrow(() -> new IllegalStateException("Rol " + name + " no encontrado en la DB."));
     }
 }

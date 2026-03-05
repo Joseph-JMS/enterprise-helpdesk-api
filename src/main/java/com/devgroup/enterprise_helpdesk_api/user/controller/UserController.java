@@ -2,12 +2,10 @@ package com.devgroup.enterprise_helpdesk_api.user.controller;
 
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -15,16 +13,21 @@ import java.util.Map;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public UserController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Acceso concedido");
+    }
 
     @PostMapping("/create-user")
-    public ResponseEntity<?> createTechnicalOrAdmin(@RequestBody RegisterRequest registerRequest) {
-        try {
+    public ResponseEntity<Map<String, String>> createTechnicalOrAdmin(@Valid @RequestBody RegisterRequest registerRequest) {
             authService.registerUser(registerRequest);
-            return ResponseEntity.ok(Map.of("message", "Usuario administrativo creado con exito"));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("message", "Usuario administrativo creado con exito"));
     }
 }

@@ -21,6 +21,8 @@ import java.util.HexFormat;
 @Service
 public class RefreshTokenService {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
@@ -83,7 +85,7 @@ public class RefreshTokenService {
 
     private String generateSecureToken() {
         byte[] bytes = new byte[64];
-        new SecureRandom().nextBytes(bytes);
+        SECURE_RANDOM.nextBytes(bytes);
         return HexFormat.of().formatHex(bytes);
     }
 
@@ -93,7 +95,7 @@ public class RefreshTokenService {
             byte[] hashBytes = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(hashBytes);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 no disponible", e);
+            throw new IllegalArgumentException("SHA-256 no disponible", e);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.devgroup.enterprise_helpdesk_api.enums;
+package com.devgroup.enterprise_helpdesk_api.user.entity;
 
 public enum RoleName {
     ROLE_ADMIN,
