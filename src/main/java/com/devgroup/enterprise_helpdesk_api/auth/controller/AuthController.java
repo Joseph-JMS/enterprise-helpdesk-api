@@ -3,18 +3,22 @@ package com.devgroup.enterprise_helpdesk_api.auth.controller;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RefreshTokenRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.response.AuthResponse;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
+import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException;
 import com.devgroup.enterprise_helpdesk_api.auth.service.RefreshTokenService;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.LoginRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RegisterRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.service.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -44,12 +48,31 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
-        return ResponseEntity.ok(authService.buildAuthResponse(authentication));
+        String rawRefreshToken = refreshTokenService.createRefreshToken(request.getUsername());
+        AuthResponse authResponse = authService.buildAuthResponse(authentication);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(rawRefreshToken).toString())
+                .body(authResponse);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.refreshAuth(request.getRefreshToken()));
+    public ResponseEntity<AuthResponse> refresh(@CookieValue(name = "refreshToken", required = false) String rawRefreshToken) {
+        if (rawRefreshToken == null) {
+            throw new RefreshTokenException("Refresh token no encontrado");
+        }
+
+        AuthResponse authResponse = authService.refreshAuth(rawRefreshToken);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(authResponse.getRefreshToken()).toString())
+                .body(new AuthResponse(
+                        authResponse.getAccessToken(),
+                        null,
+                        authResponse.getUsername(),
+                        authResponse.getRoles(),
+                        authResponse.getExpiresIn()
+                ));
     }
 
     @PostMapping("/logout")
@@ -58,7 +81,9 @@ public class AuthController {
             refreshTokenService.revokeByUsername(authentication.getName());
         }
 
-        return ResponseEntity.ok(Map.of("message", "Sesion cerrada exitosamente"));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, clearRefreshTokenCookie().toString())
+                .body(Map.of("message", "Sesion cerrada exitosamente"));
     }
 
     @GetMapping("/validate")
@@ -68,6 +93,27 @@ public class AuthController {
         }
         String token = authHeader.substring(7);
         return ResponseEntity.ok(authService.validateAuth(token));
+    }
+
+
+    private ResponseCookie buildRefreshTokenCookie(String rawRefreshToken) {
+        return ResponseCookie.from("refreshToken", rawRefreshToken)
+                .httpOnly(true)
+                .secure(false) //Cambiar a true para prod
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofDays(7))
+                .sameSite("Strict")
+                .build();
+    }
+
+    private ResponseCookie clearRefreshTokenCookie() {
+        return ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ZERO)
+                .sameSite("Strict")
+                .build();
     }
 
 }

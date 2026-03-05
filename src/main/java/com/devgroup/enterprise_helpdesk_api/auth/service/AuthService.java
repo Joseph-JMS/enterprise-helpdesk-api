@@ -76,11 +76,11 @@ public class AuthService {
                 .toList();
 
         String accessToken = jwtUtils.generateAccessToken(authentication);
-        String refreshToken = refreshTokenService.createRefreshToken(username);
+//        String refreshToken = refreshTokenService.createRefreshToken(username);
 
         return new AuthResponse(
                 accessToken,
-                refreshToken,
+                null,
                 username,
                 roles,
                 jwtUtils.getExpirationMs() / 1000

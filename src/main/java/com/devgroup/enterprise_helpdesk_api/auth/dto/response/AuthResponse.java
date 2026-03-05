@@ -1,5 +1,7 @@
 package com.devgroup.enterprise_helpdesk_api.auth.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 public class AuthResponse {
@@ -20,6 +22,8 @@ public class AuthResponse {
     public String getAccessToken() {
         return accessToken;
     }
+
+    @JsonIgnore
     public String getRefreshToken() {
         return refreshToken;
     }
