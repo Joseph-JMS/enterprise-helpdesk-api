@@ -1,6 +1,5 @@
 package com.devgroup.enterprise_helpdesk_api.auth.controller;
 
-import com.devgroup.enterprise_helpdesk_api.auth.dto.request.RefreshTokenRequest;
 import com.devgroup.enterprise_helpdesk_api.auth.dto.response.AuthResponse;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException;

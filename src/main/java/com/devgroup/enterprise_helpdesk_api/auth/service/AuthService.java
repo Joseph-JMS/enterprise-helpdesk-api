@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class AuthService {
@@ -73,10 +74,11 @@ public class AuthService {
 
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .filter(Objects::nonNull)
+                .filter(r -> r.startsWith("ROLE_"))
                 .toList();
 
         String accessToken = jwtUtils.generateAccessToken(authentication);
-//        String refreshToken = refreshTokenService.createRefreshToken(username);
 
         return new AuthResponse(
                 accessToken,
