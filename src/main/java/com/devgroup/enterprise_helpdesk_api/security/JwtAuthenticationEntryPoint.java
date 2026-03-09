@@ -15,19 +15,26 @@ import java.util.Map;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    private final ObjectMapper objectMapper;
+
+    public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         Map<String, Object> body = Map.of(
+                "type", "about:blank",
+                "title", "No autorizado",
                 "status", 401,
-                "error", "No autorizado",
-                "message", "Debes iniciar sesion para acceder a este recurso",
-                "path", request.getServletPath()
+                "detail", "Debes iniciar sesion para acceder a este recurso",
+                "instance", request.getRequestURI()
         );
 
-        new ObjectMapper().writeValue(response.getOutputStream(), body);
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        objectMapper.writeValue(response.getOutputStream(), body);
     }
 
 }

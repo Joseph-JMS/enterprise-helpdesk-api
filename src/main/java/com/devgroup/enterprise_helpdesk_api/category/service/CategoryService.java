@@ -69,9 +69,9 @@ public class CategoryService {
     public void delete(Long id) {
         Category category = getCategoryOrThrow(id);
 
-        if (ticketRepository.existsByCategory(category)) {
-            throw new CategoryInUseException("No se puede eliminar la categoria porque tiene tickets asociados");
-        }
+//        if (ticketRepository.existsByCategory(category)) {
+//            throw new CategoryInUseException("No se puede eliminar la categoria porque tiene tickets asociados");
+//        }
 
         categoryRepository.delete(category);
     }
