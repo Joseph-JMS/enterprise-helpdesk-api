@@ -77,6 +77,15 @@ public class RefreshTokenService {
                 }));
     }
 
+    @Transactional
+    public void revokeByRawToken(String rawToken) {
+        String hash = hashToken(rawToken);
+        refreshTokenRepository.findByTokenHash(hash).ifPresent(rt -> {
+            rt.setRevoked(true);
+            refreshTokenRepository.save(rt);
+        });
+    }
+
     @Scheduled(cron = "0 0 2 * * *")
     @Transactional
     public void cleanupExpiredTokens() {

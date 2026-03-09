@@ -75,8 +75,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(Authentication authentication) {
-        if (authentication != null && authentication.getName() != null) {
+    public ResponseEntity<Map<String, String>> logout(Authentication authentication, @CookieValue(name = "refreshToken", required = false) String rawRefreshToken) {
+        if (rawRefreshToken != null) {
+            refreshTokenService.revokeByRawToken(rawRefreshToken);
+        } else if (authentication != null && authentication.getName() != null) {
             refreshTokenService.revokeByUsername(authentication.getName());
         }
 
@@ -99,7 +101,7 @@ public class AuthController {
         return ResponseCookie.from("refreshToken", rawRefreshToken)
                 .httpOnly(true)
                 .secure(false) //Cambiar a true para prod
-                .path("/api/auth/refresh")
+                .path("/api/auth")
                 .maxAge(Duration.ofDays(7))
                 .sameSite("Strict")
                 .build();
@@ -109,7 +111,7 @@ public class AuthController {
         return ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(false)
-                .path("/api/auth/refresh")
+                .path("/api/auth")
                 .maxAge(Duration.ZERO)
                 .sameSite("Strict")
                 .build();
