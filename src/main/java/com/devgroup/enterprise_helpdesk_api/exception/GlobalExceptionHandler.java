@@ -5,6 +5,9 @@ import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryInUseException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundException;
+import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidStatusTransitionException;
+import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedException;
+import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -82,6 +85,30 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleCategoryInUse(CategoryInUseException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Conflicto");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(TicketNotFoundException.class)
+    public ProblemDetail handleTicketNotFound(TicketNotFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("No encontrado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(TicketAccessDeniedException.class)
+    public ProblemDetail handleTicketAccessDenied(TicketAccessDeniedException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Acceso denegado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ProblemDetail handleInvalidStatusTransition(InvalidStatusTransitionException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Transition invalida");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
