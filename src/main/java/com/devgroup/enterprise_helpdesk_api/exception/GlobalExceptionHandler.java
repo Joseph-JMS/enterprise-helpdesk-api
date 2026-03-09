@@ -3,6 +3,7 @@ package com.devgroup.enterprise_helpdesk_api.exception;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.InvalidTokenException;
 import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryAlreadyExistsException;
+import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryInUseException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -71,6 +72,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CategoryAlreadyExistsException.class)
     public ProblemDetail handleCategoryAlreadyExists(CategoryAlreadyExistsException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Conflicto");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(CategoryInUseException.class)
+    public ProblemDetail handleCategoryInUse(CategoryInUseException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Conflicto");
         problem.setInstance(URI.create(request.getRequestURI()));

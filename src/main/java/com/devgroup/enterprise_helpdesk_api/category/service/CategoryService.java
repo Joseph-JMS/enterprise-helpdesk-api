@@ -4,8 +4,10 @@ import com.devgroup.enterprise_helpdesk_api.category.dto.CategoryRequest;
 import com.devgroup.enterprise_helpdesk_api.category.dto.CategoryResponse;
 import com.devgroup.enterprise_helpdesk_api.category.entity.Category;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryAlreadyExistsException;
+import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryInUseException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.category.repository.CategoryRepository;
+import com.devgroup.enterprise_helpdesk_api.ticket.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +17,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TicketRepository ticketRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, TicketRepository ticketRepository) {
         this.categoryRepository = categoryRepository;
+        this.ticketRepository = ticketRepository;
     }
 
     public List<CategoryResponse> findAll() {
@@ -69,9 +73,9 @@ public class CategoryService {
     public void delete(Long id) {
         Category category = getCategoryOrThrow(id);
 
-//        if (ticketRepository.existsByCategory(category)) {
-//            throw new CategoryInUseException("No se puede eliminar la categoria porque tiene tickets asociados");
-//        }
+        if (ticketRepository.existsByCategory(category)) {
+            throw new CategoryInUseException("No se puede eliminar la categoria porque tiene tickets asociados");
+        }
 
         categoryRepository.delete(category);
     }
