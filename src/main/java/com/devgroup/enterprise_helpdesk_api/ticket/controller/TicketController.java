@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
@@ -39,16 +40,19 @@ public class TicketController {
     }
 
     @GetMapping("/unassigned")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TECHNICIAN')")
     public ResponseEntity<Page<TicketResponse>> getUnassigned(Pageable pageable) {
         return ResponseEntity.ok(ticketService.findUnassigned(pageable));
     }
 
     @GetMapping("/assigned")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TECHNICIAN')")
     public ResponseEntity<Page<TicketResponse>> getAssignedToMe(Authentication authentication, Pageable pageable) {
         return ResponseEntity.ok(ticketService.findAssignedToMe(authentication.getName(), pageable));
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Page<TicketResponse>> getAll(Pageable pageable) {
         return ResponseEntity.ok(ticketService.findAll(pageable));
     }
@@ -65,6 +69,7 @@ public class TicketController {
 
 
     @PatchMapping("/{id}/assign")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TECHNICIAN')")
     public ResponseEntity<TicketResponse> assign(@PathVariable Long id,
                                                  @RequestParam(required = false) String assignedUsername, Authentication authentication) {
         return ResponseEntity.ok(ticketService.assign(id, assignedUsername, authentication.getName(), getRoles(authentication)));

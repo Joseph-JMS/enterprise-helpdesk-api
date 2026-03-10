@@ -29,7 +29,7 @@ public class User {
     private String lastName;
 
     @Column(nullable = false)
-    private boolean enabled;
+    private boolean enabled = true;
 
     @ManyToMany
     @JoinTable(

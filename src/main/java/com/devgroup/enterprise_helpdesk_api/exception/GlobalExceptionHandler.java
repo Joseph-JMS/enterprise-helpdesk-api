@@ -11,6 +11,7 @@ import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedE
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidRoleException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
+import com.devgroup.enterprise_helpdesk_api.user.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -127,6 +128,14 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleInvalidRole(InvalidRoleException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problem.setTitle("Solicitud inválida");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("No encontrado");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
