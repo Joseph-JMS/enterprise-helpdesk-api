@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,8 +41,11 @@ public class AuthService {
     @Transactional
     public void registerUser(RegisterRequest request) {
 
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException("El username ya esta en uso");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("El email ya esta en uso");
         }
 
         User user = new User();
@@ -54,18 +56,8 @@ public class AuthService {
         user.setEnabled(true);
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(List.of(getRoleFromDb(RoleName.ROLE_USER)));
 
-        List<Role> roles = new ArrayList<>();
-        if (request.getRoles() == null || request.getRoles().isEmpty()) {
-            roles.add(getRoleFromDb(RoleName.ROLE_USER));
-        } else {
-            request.getRoles().forEach(roleStr -> {
-                RoleName roleName = RoleName.valueOf(roleStr);
-                roles.add(getRoleFromDb(roleName));
-            });
-        }
-
-        user.setRoles(roles);
         userRepository.save(user);
     }
 

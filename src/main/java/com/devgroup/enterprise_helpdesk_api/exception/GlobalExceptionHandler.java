@@ -9,6 +9,7 @@ import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidAssignmentEx
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidStatusTransitionException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketNotFoundException;
+import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidRoleException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -118,6 +119,14 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleInvalidAssignment(InvalidAssignmentException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problem.setTitle("Solicitud invalida");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidRoleException.class)
+    public ProblemDetail handleInvalidRole(InvalidRoleException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Solicitud inválida");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
