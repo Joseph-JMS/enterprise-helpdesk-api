@@ -6,6 +6,7 @@ import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundE
 import com.devgroup.enterprise_helpdesk_api.category.repository.CategoryRepository;
 import com.devgroup.enterprise_helpdesk_api.ticket.dto.TicketRequest;
 import com.devgroup.enterprise_helpdesk_api.ticket.dto.TicketResponse;
+import com.devgroup.enterprise_helpdesk_api.ticket.dto.TicketStatusHistoryResponse;
 import com.devgroup.enterprise_helpdesk_api.ticket.entity.Ticket;
 import com.devgroup.enterprise_helpdesk_api.ticket.entity.TicketStatus;
 import com.devgroup.enterprise_helpdesk_api.ticket.entity.TicketStatusHistory;
@@ -80,6 +81,21 @@ public class TicketService {
     public Page<TicketResponse> findAll(Pageable pageable) {
         return ticketRepository.findAll(pageable)
                 .map(this::toResponse);
+    }
+
+    public List<TicketStatusHistoryResponse> findHistoryByTicket(Long ticketId, String username, List<String> roles) {
+        Ticket ticket = getTicketOrThrow(ticketId);
+
+        boolean isAdminOrTechnician = roles.contains("ROLE_ADMIN") || roles.contains("ROLE_TECHNICIAN");
+
+        if (!isAdminOrTechnician && !ticket.getCreatedBy().getUsername().equals(username)) {
+            throw new TicketAccessDeniedException("No tienes permiso para ver el historial");
+        }
+
+        return statusHistoryRepository.findByTicketOrderByChangedAtAsc(ticket)
+                .stream()
+                .map(this::toHistoryResponse)
+                .toList();
     }
 
 
@@ -245,6 +261,16 @@ public class TicketService {
         response.setEnabled(category.isEnabled());
         response.setCreatedAt(category.getCreatedAt());
         response.setUpdatedAt(category.getUpdatedAt());
+        return response;
+    }
+
+    private TicketStatusHistoryResponse toHistoryResponse(TicketStatusHistory history) {
+        TicketStatusHistoryResponse response = new TicketStatusHistoryResponse();
+        response.setId(history.getId());
+        response.setChangedBy(history.getChangeBy().getUsername());
+        response.setPreviousStatus(history.getPreviousStatus());
+        response.setNewStatus(history.getNewStatus());
+        response.setChangedAt(history.getChangedAt());
         return response;
     }
 
