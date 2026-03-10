@@ -5,6 +5,7 @@ import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryInUseException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundException;
+import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidAssignmentException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidStatusTransitionException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketNotFoundException;
@@ -109,6 +110,14 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleInvalidStatusTransition(InvalidStatusTransitionException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         problem.setTitle("Transition invalida");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidAssignmentException.class)
+    public ProblemDetail handleInvalidAssignment(InvalidAssignmentException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Solicitud invalida");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }

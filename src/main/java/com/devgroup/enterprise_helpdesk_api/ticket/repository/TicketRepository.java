@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    Page<Ticket> findByCreateBy(User createdBy, Pageable pageable);
+    Page<Ticket> findByCreatedBy(User createdBy, Pageable pageable);
     Page<Ticket> findByAssignedTo(User assignedTo, Pageable pageable);
     Page<Ticket> findByAssignedToIsNullAndStatus(TicketStatus status, Pageable pageable);
     Page<Ticket> findAll(Pageable pageable);

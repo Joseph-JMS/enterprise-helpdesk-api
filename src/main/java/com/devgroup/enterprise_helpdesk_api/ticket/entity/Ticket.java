@@ -30,7 +30,7 @@ public class Ticket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
-    private User createBy;
+    private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_to_id")
@@ -89,11 +89,11 @@ public class Ticket {
     public void setStatus(TicketStatus status) {
         this.status = status;
     }
-    public User getCreateBy() {
-        return createBy;
+    public User getCreatedBy() {
+        return createdBy;
     }
-    public void setCreateBy(User createBy) {
-        this.createBy = createBy;
+    public void setCreatedBy(User createBy) {
+        this.createdBy = createBy;
     }
     public User getAssignedTo() {
         return assignedTo;
