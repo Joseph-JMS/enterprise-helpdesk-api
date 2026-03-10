@@ -4,6 +4,7 @@ import com.devgroup.enterprise_helpdesk_api.report.dto.*;
 import com.devgroup.enterprise_helpdesk_api.report.service.ReportService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class ReportController {
 
     @GetMapping("/summary")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<SummaryResponse>> getSummary() {
+    public ResponseEntity<SummaryResponse> getSummary() {
         return ResponseEntity.ok(reportService.getSummary());
     }
 
@@ -54,5 +55,17 @@ public class ReportController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<SlaReportResponse>> getSla() {
         return ResponseEntity.ok(reportService.getSla());
+    }
+
+    @GetMapping("/my-performance")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TECHNICIAN')")
+    public ResponseEntity<TechnicianReportResponse> getMyPerformance(Authentication authentication) {
+        return ResponseEntity.ok(reportService.getMyPerformance(authentication.getName()));
+    }
+
+    @GetMapping("/my-sla")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TECHNICIAN')")
+    public ResponseEntity<List<SlaReportResponse>> getMySla(Authentication authentication) {
+        return ResponseEntity.ok(reportService.getMySla(authentication.getName()));
     }
 }

@@ -7,6 +7,8 @@ import com.devgroup.enterprise_helpdesk_api.ticket.entity.TicketPriority;
 import com.devgroup.enterprise_helpdesk_api.ticket.entity.TicketStatus;
 import com.devgroup.enterprise_helpdesk_api.ticket.repository.TicketRepository;
 import com.devgroup.enterprise_helpdesk_api.user.entity.RoleName;
+import com.devgroup.enterprise_helpdesk_api.user.entity.User;
+import com.devgroup.enterprise_helpdesk_api.user.exception.UserNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.user.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,55 @@ public class ReportService {
                     List<Ticket> resolvedTickets = ticketRepository.findByPriorityAndStatusIn(
                             priority, List.of(TicketStatus.RESOLVED, TicketStatus.CLOSED)
                     );
+
+                    long totalTickets = resolvedTickets.size();
+
+                    long withinSla = resolvedTickets.stream()
+                            .filter(t -> t.getResolvedAt() != null)
+                            .filter(t -> Duration.between(t.getCreatedAt(), t.getResolvedAt()).toHours() <= thresholdHours)
+                            .count();
+
+                    long breachedSla = totalTickets - withinSla;
+                    double compliance = totalTickets > 0
+                            ? (double) withinSla / totalTickets * 100
+                            : 0.0;
+
+                    SlaReportResponse response = new SlaReportResponse();
+                    response.setPriority(priority.name());
+                    response.setThresholdHours(thresholdHours);
+                    response.setTotalTickets(totalTickets);
+                    response.setWithinSla(withinSla);
+                    response.setBreachedSla(breachedSla);
+                    response.setCompliancePercentage(Math.round(compliance * 100.0) / 100.0);
+                    return response;
+                })
+                .toList();
+    }
+
+    public TechnicianReportResponse getMyPerformance(String username) {
+        User technician = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+        TechnicianReportResponse response = new TechnicianReportResponse();
+        response.setTechnicianUsername(technician.getUsername());
+        response.setAssignedTickets(ticketRepository.countByAssignedTo(technician));
+        response.setResolvedTickets(ticketRepository.countByAssignedToAndStatus(technician, TicketStatus.RESOLVED));
+        return response;
+    }
+
+    public List<SlaReportResponse> getMySla(String username) {
+        User technician = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+
+        return Arrays.stream(TicketPriority.values())
+                .map(priority -> {
+                    int thresholdHours = SlaThreshold.getHours(priority);
+
+                    List<Ticket> resolvedTickets = ticketRepository
+                            .findByAssignedToAndPriorityAndStatusIn(
+                                    technician,
+                                    priority,
+                                    List.of(TicketStatus.RESOLVED, TicketStatus.CLOSED));
 
                     long totalTickets = resolvedTickets.size();
 

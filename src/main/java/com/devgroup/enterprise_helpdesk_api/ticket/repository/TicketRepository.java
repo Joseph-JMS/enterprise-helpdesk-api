@@ -30,6 +30,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     long countByAssignedToAndStatus(User assignedTo, TicketStatus status);
     List<Ticket> findByPriorityAndResolvedAtIsNotNull(TicketPriority priority);
     List<Ticket> findByPriorityAndStatusIn(TicketPriority priority, List<TicketStatus> statuses);
+    List<Ticket> findByAssignedToAndPriorityAndStatusIn(User assignedTo, TicketPriority priority, List<TicketStatus> statuses);
 
     @Query("SELECT t.category.name AS categoryName, COUNT(t) AS totalTickets FROM Ticket t GROUP BY t.category.name")
     List<CategoryCount> countGroupedByCategory();
