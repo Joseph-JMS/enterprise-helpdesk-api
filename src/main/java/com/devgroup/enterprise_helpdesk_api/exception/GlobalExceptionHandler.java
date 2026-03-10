@@ -5,6 +5,8 @@ import com.devgroup.enterprise_helpdesk_api.auth.exception.RefreshTokenException
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryInUseException;
 import com.devgroup.enterprise_helpdesk_api.category.exception.CategoryNotFoundException;
+import com.devgroup.enterprise_helpdesk_api.comments.exception.CommentAccessDeniedException;
+import com.devgroup.enterprise_helpdesk_api.comments.exception.CommentNotFoundException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidAssignmentException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidStatusTransitionException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedException;
@@ -136,6 +138,22 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("No encontrado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ProblemDetail handleCommentNotFound(CommentNotFoundException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("No encontrado");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(CommentAccessDeniedException.class)
+    public ProblemDetail handleCommentAccessDenied(CommentAccessDeniedException ex, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Acceso denegado");
         problem.setInstance(URI.create(request.getRequestURI()));
         return problem;
     }
