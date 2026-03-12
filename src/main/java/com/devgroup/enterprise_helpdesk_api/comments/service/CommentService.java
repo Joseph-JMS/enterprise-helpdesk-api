@@ -39,7 +39,7 @@ public class CommentService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
         Comment comment = new Comment();
-        comment.setContent(request.getComtent());
+        comment.setContent(request.getContent());
         comment.setTicket(ticket);
         comment.setAuthor(author);
 

@@ -7,13 +7,13 @@ public class CommentRequest {
 
     @NotBlank(message = "El contenido es obligatorio")
     @Size(max = 2000, message = "El comentario no puede superar los 2000 caracteres")
-    private String comtent;
+    private String content;
 
-    public String getComtent() {
-        return comtent;
+    public String getContent() {
+        return content;
     }
-    public void setComtent(String comtent) {
-        this.comtent = comtent;
+    public void setContent(String content) {
+        this.content = content;
     }
 
 }

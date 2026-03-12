@@ -218,7 +218,7 @@ public class TicketService {
         history.setTicket(ticket);
         history.setPreviousStatus(previous);
         history.setNewStatus(newStatus);
-        history.setChangeBy(changedBy);
+        history.setChangedBy(changedBy);
         statusHistoryRepository.save(history);
     }
 
@@ -267,7 +267,7 @@ public class TicketService {
     private TicketStatusHistoryResponse toHistoryResponse(TicketStatusHistory history) {
         TicketStatusHistoryResponse response = new TicketStatusHistoryResponse();
         response.setId(history.getId());
-        response.setChangedBy(history.getChangeBy().getUsername());
+        response.setChangedBy(history.getChangedBy().getUsername());
         response.setPreviousStatus(history.getPreviousStatus());
         response.setNewStatus(history.getNewStatus());
         response.setChangedAt(history.getChangedAt());

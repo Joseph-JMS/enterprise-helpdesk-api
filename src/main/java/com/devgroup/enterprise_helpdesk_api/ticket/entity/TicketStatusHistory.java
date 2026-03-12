@@ -18,8 +18,8 @@ public class TicketStatusHistory {
     private Ticket ticket;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "change_by_id")
-    private User changeBy;
+    @JoinColumn(name = "changed_by_id")
+    private User changedBy;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -49,11 +49,11 @@ public class TicketStatusHistory {
     public void setTicket(Ticket ticket) {
         this.ticket = ticket;
     }
-    public User getChangeBy() {
-        return changeBy;
+    public User getChangedBy() {
+        return changedBy;
     }
-    public void setChangeBy(User changeBy) {
-        this.changeBy = changeBy;
+    public void setChangedBy(User changeBy) {
+        this.changedBy = changeBy;
     }
     public TicketStatus getPreviousStatus() {
         return previousStatus;
