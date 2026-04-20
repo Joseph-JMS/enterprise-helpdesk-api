@@ -120,10 +120,16 @@ public class TicketService {
             throw new InvalidStatusTransitionException("Solo se pueden asignar tickets en estado OPEN");
         }
 
-        if (isAdmin && (assignedUsername == null || assignedUsername.isBlank())) {
-            throw new InvalidAssignmentException("Debes especificar un tecnico par asignar");
+        String usernameToAssign;
+        if (isAdmin) {
+            if (assignedUsername == null || assignedUsername.isBlank()) {
+                throw new InvalidAssignmentException("El admin debe especificar un técnico");
+            }
+            usernameToAssign = assignedUsername;
+        } else {
+            usernameToAssign = requesterUsername;
         }
-        String usernameToAssign = isAdmin ? assignedUsername :  requesterUsername;
+
         User assignedTo = getUserOrThrow(usernameToAssign);
 
         TicketStatus previousStatus = ticket.getStatus();
