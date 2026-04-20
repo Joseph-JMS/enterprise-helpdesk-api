@@ -1,0 +1,29 @@
+target/
+
+# Configuracion de IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+
+# Control de versiones
+.git/
+.gitignore
+.gitattributes
+
+# Scripts de Maven
+mvnw
+mvnw.cmd
+.mvn/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Logs y Temporales
+*.log
+temp/
