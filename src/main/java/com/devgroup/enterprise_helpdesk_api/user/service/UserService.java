@@ -1,5 +1,6 @@
 package com.devgroup.enterprise_helpdesk_api.user.service;
 
+import com.devgroup.enterprise_helpdesk_api.user.dto.request.ChangePasswordRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.CreateUserRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.UpdateProfileRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.UpdateUserRequest;
@@ -7,6 +8,7 @@ import com.devgroup.enterprise_helpdesk_api.user.dto.response.UserResponse;
 import com.devgroup.enterprise_helpdesk_api.user.entity.Role;
 import com.devgroup.enterprise_helpdesk_api.user.entity.RoleName;
 import com.devgroup.enterprise_helpdesk_api.user.entity.User;
+import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidPasswordException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidRoleException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserNotFoundException;
@@ -116,6 +118,21 @@ public class UserService {
     public void delete(Long id) {
         User user = getUserOrThrow(id);
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public void changePassword(String username, ChangePasswordRequest request) {
+        User user = getUserByUsernameOrThrow(username);
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidPasswordException("La contraseña actual es incorrecta");
+        }
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidPasswordException("Las contraseñas no coinciden");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
 

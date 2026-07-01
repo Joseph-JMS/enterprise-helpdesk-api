@@ -11,6 +11,7 @@ import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidAssignmentEx
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.InvalidStatusTransitionException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketAccessDeniedException;
 import com.devgroup.enterprise_helpdesk_api.ticket.exception.TicketNotFoundException;
+import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidPasswordException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.InvalidRoleException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserAlreadyExistsException;
 import com.devgroup.enterprise_helpdesk_api.user.exception.UserNotFoundException;
@@ -155,6 +156,13 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
         problem.setTitle("Acceso denegado");
         problem.setInstance(URI.create(request.getRequestURI()));
+        return problem;
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ProblemDetail handleInvalidPasswordException(InvalidPasswordException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Contraseña inválida");
         return problem;
     }
 

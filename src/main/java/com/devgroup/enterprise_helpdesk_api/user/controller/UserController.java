@@ -1,5 +1,6 @@
 package com.devgroup.enterprise_helpdesk_api.user.controller;
 
+import com.devgroup.enterprise_helpdesk_api.user.dto.request.ChangePasswordRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.CreateUserRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.UpdateProfileRequest;
 import com.devgroup.enterprise_helpdesk_api.user.dto.request.UpdateUserRequest;
@@ -78,6 +79,13 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request,
+                                               Authentication authentication) {
+        userService.changePassword(authentication.getName(), request);
         return ResponseEntity.noContent().build();
     }
 
