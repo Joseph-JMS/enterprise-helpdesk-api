@@ -28,6 +28,7 @@ public class TicketController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<TicketResponse> create(@Valid @RequestBody TicketRequest request, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ticketService.create(request, authentication.getName()));
@@ -35,6 +36,7 @@ public class TicketController {
 
 
     @GetMapping("/my-tickets")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Page<TicketResponse>> getMyTickets(Authentication authentication, Pageable pageable) {
         return ResponseEntity.ok(ticketService.findMyTickets(authentication.getName(), pageable));
     }
